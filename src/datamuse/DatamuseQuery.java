@@ -59,6 +59,18 @@ public class DatamuseQuery {
     }
 
     /**
+     * Returns a list of words beginning with the specified letters
+     * @param startLetter The letter(s) the words should start with.
+     * @param maxResults The maximum number of results to return, not to exceed 1000 per the Datamuse api
+     * @return A list of matching words.
+     */
+    public String wordsStartingWith(String startLetter, int maxResults) {
+        if (maxResults > 1000)
+            throw new IllegalArgumentException("maxResults cannot exceed 1000");
+        return getJSON("http://api.datamuse.com/words?sp=" + startLetter + "*" + "&max=" + maxResults);
+    }
+
+    /**
      * Returns a list of words beginning and ending with the specified letters and with the specified number of letters
      * in between.
      * @param startLetter The letter(s) the similar words should start with.
