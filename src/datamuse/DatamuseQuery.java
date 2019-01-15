@@ -22,8 +22,34 @@ import java.net.URLConnection;
  */
 public class DatamuseQuery {
 
-    public DatamuseQuery() {
+    //Maximum results to return from a query
+    private int maxResults;
 
+    /**
+     * Constructor. Sets the maximum number of results to return from a query to 1000.
+     */
+    public DatamuseQuery() {
+        //Sets maxResults to Datamuse's maximum value
+        this.maxResults = 1000;
+    }
+
+    /**
+     * Constructor that sets maxResults
+     * @param maxResults the maximum number of results to return from a query. Per Datamuse,
+     *                    cannot exceed 1000
+     */
+    public DatamuseQuery(int maxResults) {
+        if (maxResults > 1000)
+            throw new IllegalArgumentException("maxResults cannot exceed 1000");
+        this.maxResults = maxResults;
+    }
+
+    public int getMaxResults() {
+        return maxResults;
+    }
+
+    public void setMaxResults(int maxResults) {
+        this.maxResults = maxResults;
     }
 
     /**
@@ -33,7 +59,7 @@ public class DatamuseQuery {
      */
     public String findSimilar(String word) {
         String s = word.replaceAll(" ", "+");
-        return getJSON("http://api.datamuse.com/words?rd="+s);
+        return getJSON("http://api.datamuse.com/words?rd=" + s + "&max=" + maxResults);
     }
 
     /**
@@ -44,7 +70,7 @@ public class DatamuseQuery {
      */
     public String findSimilarStartsWith(String word, String startLetter) {
         String s = word.replaceAll(" ", "+");
-        return getJSON("http://api.datamuse.com/words?rd="+s+"&sp="+startLetter+"*");
+        return getJSON("http://api.datamuse.com/words?rd=" + s + "&sp=" + startLetter+"*" + "&max=" + maxResults);
     }
 
     /**
@@ -55,19 +81,25 @@ public class DatamuseQuery {
      */
     public String findSimilarEndsWith(String word, String endLetter) {
         String s = word.replaceAll(" ", "+");
-        return getJSON("http://api.datamuse.com/words?rd="+s+"&sp=*"+endLetter);
+        return getJSON("http://api.datamuse.com/words?rd=" + s + "&sp=*" + endLetter + "&max=" + maxResults);
     }
 
     /**
      * Returns a list of words beginning with the specified letters
      * @param startLetter The letter(s) the words should start with.
-     * @param maxResults The maximum number of results to return, not to exceed 1000 per the Datamuse api
      * @return A list of matching words.
      */
-    public String wordsStartingWith(String startLetter, int maxResults) {
-        if (maxResults > 1000)
-            throw new IllegalArgumentException("maxResults cannot exceed 1000");
+    public String wordsStartingWith(String startLetter) {
         return getJSON("http://api.datamuse.com/words?sp=" + startLetter + "*" + "&max=" + maxResults);
+    }
+
+    public String wordsStartingWith(String startLetter, int numberMissing) {
+        startLetter = startLetter.replaceAll(" ", "%20");
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < numberMissing; i++) {
+            sb.append("?");
+        }
+        return getJSON("http://api.datamuse.com/words?sp=" + startLetter + sb + "&max=" + maxResults);
     }
 
     /**
@@ -79,11 +111,12 @@ public class DatamuseQuery {
      * @return A list of matching words.
      */
     public String wordsStartingWithEndingWith(String startLetter, String endLetter, int numberMissing) {
+        startLetter = startLetter.replaceAll(" ", "%20");
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < numberMissing; i++) {
             sb.append("?");
         }
-        return getJSON("http://api.datamuse.com/words?sp=" + startLetter + sb + endLetter);
+        return getJSON("http://api.datamuse.com/words?sp=" + startLetter + sb + endLetter + "&max=" + maxResults);
     }
 
     /**
@@ -94,7 +127,7 @@ public class DatamuseQuery {
      * @return A list of matching words.
      */
     public String wordsStartingWithEndingWith(String startLetter, String endLetter) {
-        return getJSON("http://api.datamuse.com/words?sp=" + startLetter + "*" + endLetter);
+        return getJSON("http://api.datamuse.com/words?sp=" + startLetter + "*" + endLetter + "&max=" + maxResults);
     }
 
     /**
@@ -104,7 +137,7 @@ public class DatamuseQuery {
      */
     public String soundsSimilar(String word) {
         String s = word.replaceAll(" ", "+");
-        return getJSON("http://api.datamuse.com/words?sl=" + s);
+        return getJSON("http://api.datamuse.com/words?sl=" + s + "&max=" + maxResults);
     }
 
     /**
@@ -114,7 +147,7 @@ public class DatamuseQuery {
      */
     public String speltSimilar(String word) {
         String s = word.replaceAll(" ", "+");
-        return getJSON("http://api.datamuse.com/words?sp=" + s);
+        return getJSON("http://api.datamuse.com/words?sp=" + s + "&max=" + maxResults);
     }
 
     /**
@@ -125,7 +158,7 @@ public class DatamuseQuery {
      */
     public String prefixHintSuggestions(String word) {
         String s = word.replaceAll(" ", "+");
-        return getJSON("http://api.datamuse.com/sug?s=" + s);
+        return getJSON("http://api.datamuse.com/sug?s=" + s  + "&max=" + maxResults);
     }
 
     /**
