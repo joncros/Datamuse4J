@@ -49,6 +49,8 @@ public class DatamuseQuery {
     }
 
     public void setMaxResults(int maxResults) {
+        if (maxResults > 1000)
+            throw new IllegalArgumentException("maxResults cannot exceed 1000");
         this.maxResults = maxResults;
     }
 
